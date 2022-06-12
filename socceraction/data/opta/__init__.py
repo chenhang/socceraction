@@ -9,7 +9,7 @@ __all__ = [
     'OptaEventSchema',
 ]
 
-from .loader import OptaLoader
+from .loader import OptaLoader, _eventtypesdf
 from .schema import (
     OptaCompetitionSchema,
     OptaEventSchema,

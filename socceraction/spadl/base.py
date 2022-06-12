@@ -16,7 +16,8 @@ def _fix_clearances(actions: pd.DataFrame) -> pd.DataFrame:
     clearance_idx = actions.type_id == spadlconfig.actiontypes.index('clearance')
     actions.loc[clearance_idx, 'end_x'] = next_actions[clearance_idx].start_x.values
     actions.loc[clearance_idx, 'end_y'] = next_actions[clearance_idx].start_y.values
-
+    actions.loc[clearance_idx, 'raw_end_x'] = next_actions[clearance_idx].raw_start_x.values
+    actions.loc[clearance_idx, 'raw_end_y'] = next_actions[clearance_idx].raw_start_y.values
     return actions
 
 
@@ -67,6 +68,10 @@ def _add_dribbles(actions: pd.DataFrame) -> pd.DataFrame:
     dribbles['start_y'] = prev.end_y
     dribbles['end_x'] = nex.start_x
     dribbles['end_y'] = nex.start_y
+    dribbles['raw_start_x'] = prev.raw_end_x
+    dribbles['raw_start_y'] = prev.raw_end_y
+    dribbles['raw_end_x'] = nex.raw_start_x
+    dribbles['raw_end_y'] = nex.raw_start_y
     dribbles['bodypart_id'] = spadlconfig.bodyparts.index('foot')
     dribbles['type_id'] = spadlconfig.actiontypes.index('dribble')
     dribbles['result_id'] = spadlconfig.results.index('success')

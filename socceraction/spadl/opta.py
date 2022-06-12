@@ -29,24 +29,36 @@ def convert_to_actions(events: pd.DataFrame, home_team_id: int) -> DataFrame[SPA
     """
     actions = pd.DataFrame()
 
+    events = events[(events.minute < 250) & (events.period_id < 14)]
     actions['game_id'] = events.game_id
     actions['original_event_id'] = events.event_id.astype(object)
     actions['period_id'] = events.period_id
 
-    actions['time_seconds'] = (
-        60 * events.minute
-        + events.second
-        - ((events.period_id > 1) * 45 * 60)
-        - ((events.period_id > 2) * 45 * 60)
-        - ((events.period_id > 3) * 15 * 60)
-        - ((events.period_id > 4) * 15 * 60)
-    )
+    period_ids = set(events.period_id)
+    if 3 not in period_ids and 5 in period_ids:
+        actions['time_seconds'] = (
+                60 * events.minute
+                + events.second
+                - ((events.period_id > 1) * 45 * 60)
+                - ((events.period_id > 2) * 45 * 60)
+        )
+    else:
+        actions['time_seconds'] = (
+                60 * events.minute
+                + events.second
+                - ((events.period_id > 1) * 45 * 60)
+                - ((events.period_id > 2) * 45 * 60)
+                - ((events.period_id > 3) * 15 * 60)
+                - ((events.period_id > 4) * 15 * 60)
+        )
     actions['team_id'] = events.team_id
     actions['player_id'] = events.player_id
-
     for col in ['start_x', 'end_x']:
+        actions["raw_" + col] = events[col]
         actions[col] = events[col] / 100 * spadlconfig.field_length
+
     for col in ['start_y', 'end_y']:
+        actions["raw_" + col] = events[col]
         actions[col] = events[col] / 100 * spadlconfig.field_width
 
     actions['type_id'] = events[['type_name', 'outcome', 'qualifiers']].apply(_get_type_id, axis=1)
@@ -131,6 +143,8 @@ def _get_type_id(args: Tuple[str, bool, Dict[int, Any]]) -> int:  # noqa: C901
         a = 'foul'
     elif eventname == 'tackle':
         a = 'tackle'
+    elif eventname == 'ball recovery':
+        a = 'ball_recovery'
     elif eventname in ('interception', 'blocked pass'):
         a = 'interception'
     elif eventname in ['miss', 'post', 'attempt saved', 'goal']:
@@ -159,13 +173,13 @@ def _get_type_id(args: Tuple[str, bool, Dict[int, Any]]) -> int:  # noqa: C901
 
 def _fix_owngoals(actions: pd.DataFrame) -> pd.DataFrame:
     owngoals_idx = (actions.result_id == spadlconfig.results.index('owngoal')) & (
-        actions.type_id == spadlconfig.actiontypes.index('shot')
+            actions.type_id == spadlconfig.actiontypes.index('shot')
     )
     actions.loc[owngoals_idx, 'end_x'] = (
-        spadlconfig.field_length - actions[owngoals_idx].end_x.values
+            spadlconfig.field_length - actions[owngoals_idx].end_x.values
     )
     actions.loc[owngoals_idx, 'end_y'] = (
-        spadlconfig.field_width - actions[owngoals_idx].end_y.values
+            spadlconfig.field_width - actions[owngoals_idx].end_y.values
     )
     actions.loc[owngoals_idx, 'type_id'] = spadlconfig.actiontypes.index('bad_touch')
     return actions

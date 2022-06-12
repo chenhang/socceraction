@@ -30,11 +30,11 @@ class WhoScoredParser(OptaParser):
     """
 
     def __init__(  # noqa: C901
-        self,
-        path: str,
-        competition_id: Optional[int] = None,
-        season_id: Optional[int] = None,
-        game_id: Optional[int] = None,
+            self,
+            path: str,
+            competition_id: Optional[int] = None,
+            season_id: Optional[int] = None,
+            game_id: Optional[int] = None,
     ) -> None:
         with open(path, 'rt', encoding='utf-8') as fh:
             self.root = json.load(fh)
@@ -204,8 +204,7 @@ class WhoScoredParser(OptaParser):
         game_id = self.game_id
         time_start_str = str(assertget(self.root, 'startTime'))
         time_start = datetime.strptime(time_start_str, '%Y-%m-%dT%H:%M:%S')
-        for attr in self.root['events']:
-            qualifiers = {}
+        for i, attr in enumerate(self.root['events']):
             qualifiers = {
                 int(q['type']['value']): q.get('value', True) for q in attr.get('qualifiers', [])
             }
@@ -218,13 +217,19 @@ class WhoScoredParser(OptaParser):
             if end_y is None:
                 end_y = start_y
             eventtype = attr.get('type', {})
-            period = attr.get('period', {})
+            if int(assertget(eventtype, 'value')) == 10000 and assertget(eventtype, 'displayName') == "OffsideGiven":
+                eventtype['value'] = 72
+
+
+            period = attr.get('period', {'value': 1})
             outcome = attr.get('outcomeType', {'value': 1})
             eventIdKey = 'eventId'
             if 'id' in attr:
                 eventIdKey = 'id'
-            minute = int(assertget(attr, 'expandedMinute'))
-            second = int(attr.get('second', 0))
+            minute = int(attr.get('expandedMinute', assertget(attr, 'minute')))
+            second = max([int(attr.get('second', 0)), 0])
+            if period.get('value') > 1 and minute < 45:
+                continue
             event_id = int(assertget(attr, eventIdKey))
             event = dict(
                 game_id=game_id,

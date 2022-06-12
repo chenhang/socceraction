@@ -182,6 +182,8 @@ def actiontype_onehot(actions: SPADLActions) -> Features:
     """
     X = pd.DataFrame()
     for type_name in spadlconfig.actiontypes:
+        # if type_name == "ball_recovery":
+        #     continue
         col = 'type_' + type_name
         X[col] = actions['type_name'] == type_name
     return X

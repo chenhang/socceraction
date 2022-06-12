@@ -21,6 +21,7 @@ import pandas as pd  # type: ignore
 
 field_length: float = 105.0  # unit: meters
 field_width: float = 68.0  # unit: meters
+raw_max: float = 100
 
 bodyparts: List[str] = ['foot', 'head', 'other', 'head/other']
 results: List[str] = [
@@ -55,6 +56,7 @@ actiontypes: List[str] = [
     'non_action',
     'dribble',
     'goalkick',
+    'ball_recovery',
 ]
 
 
