@@ -104,8 +104,8 @@ def _get_result_id(args: Tuple[str, bool, Dict[int, Any]]) -> int:
             r = 'owngoal'  # own goal, x and y must be switched
         else:
             r = 'success'
-    elif e == 'ball touch':
-        r = 'fail'
+    # elif e == 'ball touch':
+    #     r = 'fail'
     elif outcome:
         r = 'success'
     else:
@@ -141,8 +141,20 @@ def _get_type_id(args: Tuple[str, bool, Dict[int, Any]]) -> int:  # noqa: C901
         a = 'take_on'
     elif eventname == 'foul' and outcome is False:
         a = 'foul'
+    elif eventname == 'foul' and outcome is True:
+        a = 'foul_given'
     elif eventname == 'tackle':
         a = 'tackle'
+    elif eventname == 'challenge':
+        a = 'challenge'
+    elif eventname == 'dispossessed':
+        a = 'dispossessed'
+    elif eventname == 'ball touch' and outcome is True:
+        a = 'ball_touch'
+    elif eventname == 'error':
+        a = 'error'
+    elif eventname == 'aerial':
+        a = 'aerial'
     elif eventname == 'ball recovery':
         a = 'ball_recovery'
     elif eventname in ('interception', 'blocked pass'):
@@ -168,6 +180,8 @@ def _get_type_id(args: Tuple[str, bool, Dict[int, Any]]) -> int:  # noqa: C901
         a = 'bad_touch'
     else:
         a = 'non_action'
+    # if a == 'non_action':
+    #     print(eventname, outcome)
     return spadlconfig.actiontypes.index(a)
 
 

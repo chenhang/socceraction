@@ -410,8 +410,7 @@ class WhoScoredParser(OptaParser):
                     _camel_to_snake(name): sum(stat.values())
                     for name, stat in player['stats'].items()
                 }
-                stats = [k for k in statsdict if not k.endswith('Success')]
-
+                stats = [k for k in statsdict if not k.endswith('success')]
                 player_id = int(assertget(player, 'playerId'))
                 p = dict(
                     game_id=game_id,

@@ -57,6 +57,12 @@ actiontypes: List[str] = [
     'dribble',
     'goalkick',
     'ball_recovery',
+    'aerial',
+    'foul_given',
+    'error',
+    'ball_touch',
+    'challenge',
+    'dispossessed',
 ]
 
 
