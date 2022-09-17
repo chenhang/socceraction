@@ -277,7 +277,7 @@ def _parse_goalkeeper_event(extra: Dict[str, Any]) -> Tuple[str, str, str]:  # n
     extra_type = extra.get('goalkeeper', {}).get('type', {}).get('name')
     if extra_type == 'Shot Saved':
         a = 'keeper_save'
-    elif extra_type in ('Collected', 'Keeper Sweeper'):
+    elif extra_type in ('Collected', 'Keeper Sweeper', 'Smother'):
         a = 'keeper_claim'
     elif extra_type == 'Punch':
         a = 'keeper_punch'

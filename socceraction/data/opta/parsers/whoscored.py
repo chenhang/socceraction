@@ -39,6 +39,9 @@ class WhoScoredParser(OptaParser):
         with open(path, 'rt', encoding='utf-8') as fh:
             self.root = json.load(fh)
             self.position_mapping = lambda formation, x, y: 'Unknown'
+            if self.root['expandedMaxMinute'] > 1000:
+                self.root['expandedMaxMinute'] = max([e.get('expandedMinute', 0) for e in self.root['events']
+                                                      if e.get('expandedMinute', 0) < 1000])
 
         if competition_id is None:
             try:
@@ -208,6 +211,9 @@ class WhoScoredParser(OptaParser):
             qualifiers = {
                 int(q['type']['value']): q.get('value', True) for q in attr.get('qualifiers', [])
             }
+
+            if attr['type']['displayName'] == "OffsideGiven" and 'x' not in attr:
+                attr['x'] = 0
             start_x = float(assertget(attr, 'x'))
             start_y = float(assertget(attr, 'y'))
             end_x = _get_end_x(qualifiers)
